@@ -293,8 +293,8 @@ int main(int argc, char **argv) {
         std::printf("0x%016llx\n", static_cast<unsigned long long>(host_fingerprint()));
         return 0;
     }
-    if (kTargetId != 0ull && host_fingerprint() != kTargetId) {
-        std::fprintf(stderr, "this build is not licensed for this machine\n");
+    if (!opt.port.empty() && kTargetId != 0ull && host_fingerprint() != kTargetId) {
+        std::fprintf(stderr, "serial output is locked to another machine\n");
         return 4;
     }
 

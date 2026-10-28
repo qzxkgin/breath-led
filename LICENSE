@@ -1,0 +1,27 @@
+学习用途许可 / Educational Use License
+
+Copyright (c) 2026 qzxkgin
+
+这个仓库分享的是 RoboMaster 视觉组和电控组联调 UART 呼吸灯的做法。
+
+可以做的：
+- 阅读、克隆、编译、在自己机器上运行和修改
+- 借鉴其中的思路：协议设计、CRC-16 实现、呼吸曲线、收包状态机
+- 在注明来源的前提下引用代码片段
+
+请不要做的：
+- 把本仓库的全部或主要部分直接作为自己的课程作业、实验报告或比赛作品提交
+- 去掉署名后把它当成自己的原创作品发布
+
+代码按"原样"提供，不附带任何明示或暗示的担保，使用后果自负。
+
+---
+
+This repository shares how the vision side drives an RGB breathing LED over
+UART during a RoboMaster joint test.
+
+You may read, clone, build, run and modify it, and reuse the ideas with
+attribution. Please do not submit it, in whole or in substantial part, as your
+own coursework or competition entry.
+
+Provided as is, without warranty of any kind.

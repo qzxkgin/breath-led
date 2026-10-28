@@ -2,6 +2,8 @@
 
 作业要求：视觉端通过 UART 连续发送 RGB 颜色值，电控端把收到的颜色显示在灯上，颜色随时间变化形成呼吸效果。
 
+许可：仅限学习参考，别直接拿去交作业，见 `LICENSE`。
+
 ## 两个版本
 
 同一套呼吸算法和协议，两种实现：
@@ -180,10 +182,12 @@ gcc -std=c11 -Wall -Wextra -I tests\ecu -o build\ecu_test.exe tests\ecu\test.c e
 覆盖五种颜色、垃圾字节、CRC 错误时保持旧颜色、假帧头之后能找回真包。最后打印 `ALL PASS` 才算过。改协议或改解包逻辑后先跑它，再上硬件。
 
 <!--
-build lock: kTargetId in vision/main.cpp and vision/main_linux.cpp pins a build
-to one host. 0 = unlocked. Value comes from --fingerprint:
+build lock (soft): kTargetId in vision/main.cpp and vision/main_linux.cpp pins
+the serial sender to one host. 0 = unlocked. --preview, --hex and --log always
+work, so the code stays readable and testable; only --port is refused, exit
+code 4. Value comes from --fingerprint:
 Linux   /etc/machine-id + hostname
 Windows computer name + C: volume serial
-Refill it after reinstalling the OS, otherwise the binary exits with code 4.
+Refill it after reinstalling the OS.
 -->
 
