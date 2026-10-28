@@ -66,10 +66,10 @@ RgbPacket make_packet(uint8_t r, uint8_t g, uint8_t b) {
     return pkt;
 }
 
-constexpr uint64_t kTargetId = 0ull;
+constexpr uint64_t kTargetId = 0x25295e9eeae0ccddull;
 
 uint64_t fnv1a(const std::string &text) {
-    uint64_t hash = 1469598103934665603ull;
+    uint64_t hash = 14695981039346656037ull;
     for (unsigned char c : text) {
         hash ^= c;
         hash *= 1099511628211ull;
