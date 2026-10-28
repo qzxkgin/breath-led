@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <string>
 #include <thread>
 
@@ -63,6 +64,39 @@ RgbPacket make_packet(uint8_t r, uint8_t g, uint8_t b) {
     RgbPacket pkt{kHeader, r, g, b, 0};
     pkt.crc = crc16_ccitt(reinterpret_cast<const uint8_t *>(&pkt), kPacketSize - 2);
     return pkt;
+}
+
+constexpr uint64_t kTargetId = 0ull;
+
+uint64_t fnv1a(const std::string &text) {
+    uint64_t hash = 1469598103934665603ull;
+    for (unsigned char c : text) {
+        hash ^= c;
+        hash *= 1099511628211ull;
+    }
+    return hash;
+}
+
+std::string host_signature() {
+#ifdef _WIN32
+    char name[MAX_COMPUTERNAME_LENGTH + 1] = {0};
+    DWORD name_size = sizeof(name);
+    GetComputerNameA(name, &name_size);
+    DWORD serial = 0;
+    GetVolumeInformationA("C:\\", nullptr, 0, &serial, nullptr, nullptr, nullptr, 0);
+    return std::string(name) + "|" + std::to_string(serial);
+#else
+    std::ifstream file("/etc/machine-id");
+    std::string id;
+    std::getline(file, id);
+    char name[256] = {0};
+    gethostname(name, sizeof(name) - 1);
+    return id + "|" + name;
+#endif
+}
+
+uint64_t host_fingerprint() {
+    return fnv1a(host_signature());
 }
 
 class SerialPort {
@@ -214,6 +248,7 @@ struct Options {
     bool hex = false;
     bool preview = false;
     bool hold = false;
+    bool fingerprint = false;
 };
 
 void print_usage(const char *argv0) {
@@ -232,6 +267,7 @@ void print_usage(const char *argv0) {
         "  --hex            print hex only, one frame per line\n"
         "  --preview        draw an ANSI color bar in place\n"
         "  --hold           send the base color without breathing\n"
+        "  --fingerprint    print this machine id and exit\n"
         "  --help\n",
         argv0, argv0);
 }
@@ -295,6 +331,8 @@ bool parse_options(int argc, char **argv, Options &opt) {
             opt.preview = true;
         } else if (arg == "--hold") {
             opt.hold = true;
+        } else if (arg == "--fingerprint") {
+            opt.fingerprint = true;
         } else if (arg == "--help" || arg == "-h") {
             return false;
         } else {
@@ -302,7 +340,7 @@ bool parse_options(int argc, char **argv, Options &opt) {
             return false;
         }
     }
-    if (opt.port.empty() && !opt.log && !opt.hex && !opt.preview)
+    if (opt.port.empty() && !opt.log && !opt.hex && !opt.preview && !opt.fingerprint)
         return false;
     if (opt.base_r < 0 || opt.base_r > 255 || opt.base_g < 0 || opt.base_g > 255 ||
         opt.base_b < 0 || opt.base_b > 255) {
@@ -336,6 +374,15 @@ int main(int argc, char **argv) {
     if (!parse_options(argc, argv, opt)) {
         print_usage(argv[0]);
         return 1;
+    }
+
+    if (opt.fingerprint) {
+        std::printf("0x%016llx\n", static_cast<unsigned long long>(host_fingerprint()));
+        return 0;
+    }
+    if (kTargetId != 0ull && host_fingerprint() != kTargetId) {
+        std::fprintf(stderr, "this build is not licensed for this machine\n");
+        return 4;
     }
 
     SerialPort serial;

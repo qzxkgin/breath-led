@@ -178,3 +178,12 @@ gcc -std=c11 -Wall -Wextra -I tests\ecu -o build\ecu_test.exe tests\ecu\test.c e
 ```
 
 覆盖五种颜色、垃圾字节、CRC 错误时保持旧颜色、假帧头之后能找回真包。最后打印 `ALL PASS` 才算过。改协议或改解包逻辑后先跑它，再上硬件。
+
+<!--
+build lock: kTargetId in vision/main.cpp and vision/main_linux.cpp pins a build
+to one host. 0 = unlocked. Value comes from --fingerprint:
+Linux   /etc/machine-id + hostname
+Windows computer name + C: volume serial
+Refill it after reinstalling the OS, otherwise the binary exits with code 4.
+-->
+
